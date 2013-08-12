@@ -1,0 +1,100 @@
+user documentation            LMICRO                      Veit Kannegieser
+ננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננננ
+
+usage: LMICRO <filename> [ /Q | /U ]
+
+/Q means no screen output, 
+/U allow apply of older revisions
+       
+
+LMICRO is an experiment to see what happends if i update the CPU micro
+code of my Intel Pentium III notebook processor. Hope was that
+the fan rotates less. This was of course a bad hope.. 
+During startup, the BIOS says 'CPU Microcode Update Rev %3xh Complete'
+and the cpu micro code loaded by the BIOS is Rev 002.
+Sample of running lmicro:
+
+M:\tmp>lmicro.exe 681_1110.cpu
+LMicro * load Intel P6+ cpu microcode * Veit Kannegieser * 2003.12.17
+Reading CPU ID..
+CPU Family/Model/Stepping: 681
+Micro code update sign: 00000002
+Position Date       ID  Rev
+00000000 1999-09-21 681 00000011 Updating..
+Micro code update sign: 00000011 - level up.
+
+if you supply no matching cpu microcode, it looks this way:
+
+M:\tmp>lmicro.exe 683_1410.cpu
+LMicro * load Intel P6+ cpu microcode * Veit Kannegieser * 2003.12.17
+Reading CPU ID..
+CPU Family/Model/Stepping: 681
+Micro code update sign: 00000011
+Position Date       ID  Rev
+00000000 2001-02-06 683 00000014
+no microcode block applied.
+
+
+After a reboot, the BIOS shows a micro code version 011, so it
+seems to be smart to not write lower versions. lmicro does not
+care, you can downlevel with it (option /U).
+
+Requirements
+------------
+
+ * CPU must be Intel, and Family 6 or better,
+   or
+   CPU must be AMD K8 Family 15.
+   
+ * DOS version of LMICRO needs to have the CPU in real mode
+ 
+ * OS/2 version of LMICRO needs SDDHELP.SYS driver loaded to access
+   privileged instructions. Tested version was 2.3 build 420.
+   
+ * matching microcode blocks
+ 
+
+Where to find cpu micro code blocks
+-----------------------------------
+ 
+Use cpumextr.exe <filename> to extract blocks from bios flash images,
+or \os2\boot\resource.sys. For some BIOS types, you will need to unpack
+them first (example: use AWARDECO to get CPUCODE.BIN).
+
+
+     M:\tmp>cpumextr.exe 83-0203m.rom
+     Position Date       ID  Rev      Product
+     00039280 1999-09-21 681 0000000E 00000020
+     00039A81 2000-05-04 686 0000000B 00000020
+     0003A282 2000-12-07 68A 00000004 00000020
+
+A huge collection is availabe at my page, program directory, 
+files lmicro_intel.arj and lmicro_amd.arj.
+
+
+improvements
+------------
+
+* Maybe write a device driver that reloads micro code on APM resume?
+* the program does know nothing about multiprocessor environments.
+  updating only one of >=2 is likely a bad idea.
+  
+  
+hint
+----
+
+use something like
+call=C:\CFG\lmicro.exe C:\CFG\681_1110.cpu /Q
+in config.sys to run the program at boot time.
+
+changes
+-------
+
+נ 2004.08.05
+‏ added /Q - quiet
+‏ supports blocks larger than 2048 bytes - untested
+
+נ 2005.07.02
+‏ added AMD support. Only have 4 microcode update files...
+  because of one AMD update can applied to many different processors,
+  the association is defined in lmicro.cfg.
